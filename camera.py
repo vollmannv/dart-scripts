@@ -20,8 +20,7 @@ class Camera:
 
     def setControlImage(self):
         s, img = self.camera.read()
-        cv2.imshow(str(self.index), img);
-        cv2.waitKey(0);
+        cv2.imwrite(str(self.index) + ".jpg", img)
         img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         self.control_image = img[340:400, 0:640]
 
@@ -50,11 +49,6 @@ class Camera:
 
         self.gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
 
-        if self.control_image is None:
-            for cam in cameras:
-                cam.setControlImage()
-            return
-
         self.diff_frame = cv2.absdiff(self.control_image, self.gray)
         self.thresh_frame = cv2.threshold(self.diff_frame, 30, 255, cv2.THRESH_BINARY)[1]
         self.thresh_frame = cv2.dilate(self.thresh_frame, None, iterations=2)
@@ -76,7 +70,6 @@ class Camera:
                 cam.take_picture()
                 print(processing.process_image(cam.diff_frame))
                 cam.setControlImage()
-
             self.motion = 0
             self.control_image = self.gray
 
@@ -95,6 +88,9 @@ if __name__ == '__main__':
     list_of_cameras.append(cam2)
     list_of_cameras.append(cam3)
     list_of_cameras.append(cam4)
+
+    for cam in list_of_cameras:
+        cam.setControlImage()
 
     while (True):
         cam1.monitor(list_of_cameras)
