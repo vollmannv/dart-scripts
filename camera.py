@@ -20,6 +20,8 @@ class Camera:
 
     def setControlImage(self):
         s, img = self.camera.read()
+        cv2.imshow(str(self.index), img);
+        cv2.waitKey(0);
         img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         self.control_image = img[340:400, 0:640]
 
@@ -32,8 +34,6 @@ class Camera:
                 time = time.strftime("%Y-%m-%d_%H-%M-%S")
                 path = "camera" + str(self.index) + "_" + time + ".jpg"
                 if not cv2.imwrite(path, self.diff_frame):
-                    raise Exception("could not save")
-                if not cv2.imwrite("camera" + str(self.index) + "_color_" + time + ".jpg", img):
                     raise Exception("could not save")
                 self.imct += 1
                 print("image saved to: " + path)
@@ -89,8 +89,12 @@ class Camera:
 if __name__ == '__main__':
     cam1 = Camera(1)
     cam2 = Camera(2)
+    cam3 = Camera(3)
+    cam4 = Camera(4)
     list_of_cameras.append(cam1)
     list_of_cameras.append(cam2)
+    list_of_cameras.append(cam3)
+    list_of_cameras.append(cam4)
 
     while (True):
         cam1.monitor(list_of_cameras)
