@@ -4,21 +4,31 @@ import json
 import numpy as np
 
 
-def process_image(img):
+def process_image(img, index):
+    calibrations = open("camera-calibrations.json", "r")
+    data = json.load(calibrations)
+    offset = data["camera" + str(index)]["center"]
     img = amplify_contrast(img)
     indices = np.where(img == [255])
     highest = [0, 0]
     for i in range(len(indices[0])):
         if indices[0][i] >= highest[0]:
             highest = [indices[0][i], indices[1][i]]
-    processedimg = np.zeros((60, 640, 3), np.uint8)
-    cv2.line(processedimg, (highest[1], 0), (highest[1], 60), (0, 255, 0), 1)
-    cv2.line(processedimg, (320, 0), (320, 60), (0, 0, 255), 1)
+    return highest[1] - 320 + int(offset)
+
+
+def process_calibration(img):
+    img = amplify_contrast(img)
+    indices = np.where(img == [255])
+    highest = [0, 0]
+    for i in range(len(indices[0])):
+        if indices[0][i] >= highest[0]:
+            highest = [indices[0][i], indices[1][i]]
     return highest[1] - 320
 
 
 def amplify_contrast(img):
-    #gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    # gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     ret, gray = cv2.threshold(img, 127, 255, 0)
     gray2 = gray.copy()
     mask = np.zeros(gray.shape, np.uint8)
