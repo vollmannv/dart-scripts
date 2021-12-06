@@ -91,16 +91,16 @@ def process_images():
     for cam in list_of_cameras:
         if cam.index == 1:
             y1 = cam.currentval
-        elif cam.index == 2:
-            x1 = cam.currentval
         elif cam.index == 3:
+            x1 = cam.currentval
+        elif cam.index == 4:
             x2 = cam.currentval * -1
         else:
             y2 = cam.currentval * -1
 
     x_coord = (x1 + x2) / 2
     y_coord = (y1 + y2) / 2
-    angle = math.atan(x_coord / y_coord) * 100
+    angle = math.degrees(math.atan(x_coord / y_coord))
     print(str("x: " + str(x_coord) + ", y: " + str(y_coord) + ", angle: " + str(angle)))
     print("x1: " + str(x1) + ", x2: " + str(x2) + "y1: " + str(y1) + ", y2: " + str(y2))
 
