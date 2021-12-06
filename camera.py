@@ -1,3 +1,5 @@
+import math
+
 import cv2, time, pandas as pd
 from datetime import datetime
 from multiprocessing import Process
@@ -17,10 +19,10 @@ class Camera:
         self.gray = None
         self.control_image = None
         self.motion = 0
+        self.currentval = 0
 
     def setControlImage(self):
         s, img = self.camera.read()
-        cv2.imwrite(str(self.index) + ".jpg", img)
         img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         self.control_image = img[340:400, 0:640]
 
@@ -68,8 +70,9 @@ class Camera:
             for cam in cameras:
                 cam.differences()
                 cam.take_picture()
-                print(processing.process_image(cam.diff_frame))
                 cam.setControlImage()
+                cam.currentval = processing.process_image(cam.diff_frame)
+            process_images()
             self.motion = 0
             self.control_image = self.gray
 
@@ -78,6 +81,34 @@ class Camera:
         frame = frame[340:400, 0:640]
         self.gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
         self.diff_frame = cv2.absdiff(self.control_image, self.gray)
+
+
+def process_images():
+    x1 = 0
+    x2 = 0
+    y1 = 0
+    y2 = 0
+    for cam in list_of_cameras:
+        if cam.index == 1:
+            y1 = cam.currentval
+        elif cam.index == 2:
+            x1 = cam.currentval
+        elif cam.index == 3:
+            x2 = cam.currentval * -1
+        else:
+            y2 = cam.currentval * -1
+
+    x_coord = (x1 + x2) / 2
+    y_coord = (y1 + y2) / 2
+    angle = math.atan(x_coord / y_coord) * 100
+    print(str("x: " + str(x_coord) + ", y: " + str(y_coord) + ", angle: " + str(angle)))
+    print("x1: " + str(x1) + ", x2: " + str(x2) + "y1: " + str(y1) + ", y2: " + str(y2))
+
+    if angle <= 360 and angle >= 180:
+        print("Obere Hälfte!")
+    else:
+        print("Untere Hälfte!")
+
 
 if __name__ == '__main__':
     cam1 = Camera(1)
@@ -94,4 +125,4 @@ if __name__ == '__main__':
 
     while (True):
         cam1.monitor(list_of_cameras)
-        time.sleep(0.1)
+        time.sleep(0.5)

@@ -14,7 +14,7 @@ def process_image(img):
     processedimg = np.zeros((60, 640, 3), np.uint8)
     cv2.line(processedimg, (highest[1], 0), (highest[1], 60), (0, 255, 0), 1)
     cv2.line(processedimg, (320, 0), (320, 60), (0, 0, 255), 1)
-    return highest[1]
+    return highest[1] - 320
 
 
 def amplify_contrast(img):
